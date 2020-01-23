@@ -30,9 +30,11 @@ public class TP3 {
 				Tweet tweet = new Tweet(json);
 
 				List<String> tweet_list_hashtags = tweet.getTweet_list_hashtags();
-				for (int i = 0; i < tweet_list_hashtags.size(); i++) {
-					String hashtag = tweet_list_hashtags.get(i);
-					context.write(new Text(hashtag), new IntWritable(1));
+				if (tweet_list_hashtags != null) {
+					for (int i = 0; i < tweet_list_hashtags.size(); i++) {
+						String hashtag = tweet_list_hashtags.get(i);
+						context.write(new Text(hashtag), new IntWritable(1));
+					}
 				}
 
 			} catch (ParseException e) {
@@ -59,19 +61,24 @@ public class TP3 {
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
+
 		Job job = Job.getInstance(conf, "TP3");
 		job.setNumReduceTasks(1);
+
 		job.setJarByClass(TP3.class);
 		job.setMapperClass(TP3Mapper.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(IntWritable.class);
+
 		job.setReducerClass(TP3Reducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 		job.setInputFormatClass(TextInputFormat.class);
+
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}
 }
